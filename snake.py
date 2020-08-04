@@ -104,14 +104,23 @@ def get_keyboard_input():
     return user_input
 
 
+def move_step_through_wall(step, size):
+    x_position = step[0]
+    y_position = step[1]
+    if (x_position < 0):
+        x_position = size - 1
+    elif (y_position < 0):
+        y_position = size - 1
+    elif (x_position == size):
+        x_position = 0
+    elif (y_position == size):
+        y_position = 0
+    return (x_position, y_position)
+
+
 def get_next_step(next_step, size, snake_body, input_function):
-    validStep = False
-    while (not validStep):
-        current_step = next_step
-        next_step = map_input_to_next_position(input_function, next_step)
-        validStep = validate_Step(size, snake_body, next_step)
-        if (not validStep):
-            next_step = current_step
+    next_step = map_input_to_next_position(input_function, next_step)
+    next_step = move_step_through_wall(next_step, size)
     return next_step
 
 
@@ -134,6 +143,8 @@ def run_initial_game_loop(snake_body, initial_length, starting_position, size, i
         print_game(size, snake_body, None)
         next_step = get_next_step(
             next_step, size, snake_body, inputMethod)
+        if (next_step in snake_body and i < 2):
+            snake_body = snake_body[:snake_body.index(next_step) + 1]
         move_snake(snake_body, next_step, is_fed)
     return snake_body
 
@@ -155,6 +166,8 @@ def run_main_game_loop(snake_body, initial_length, size, inputMethod):
         if (next_step == snack_position):
             is_fed = True
             snack_needed = True
+        if (next_step in snake_body):
+            snake_body = snake_body[:snake_body.index(next_step) + 1]
         move_snake(snake_body, next_step, is_fed)
         is_fed = False
 
